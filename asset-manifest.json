@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/EncryptionTool-/static/css/main.a3979ae9.css",
+    "main.js": "/EncryptionTool-/static/js/main.e197c942.js",
+    "static/js/488.5cceb767.chunk.js": "/EncryptionTool-/static/js/488.5cceb767.chunk.js",
+    "index.html": "/EncryptionTool-/index.html",
+    "main.a3979ae9.css.map": "/EncryptionTool-/static/css/main.a3979ae9.css.map",
+    "main.e197c942.js.map": "/EncryptionTool-/static/js/main.e197c942.js.map",
+    "488.5cceb767.chunk.js.map": "/EncryptionTool-/static/js/488.5cceb767.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a3979ae9.css",
+    "static/js/main.e197c942.js"
+  ]
+}

@@ -1,1 +1,1 @@
-# EncryptionTool-
+# EncryptionTool

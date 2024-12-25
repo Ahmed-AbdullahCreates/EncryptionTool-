@@ -1399,107 +1399,138 @@ export default function EncryptionTool() {
             </div>
           </div>
 
-          <div className={`mt-8 p-6 rounded-xl transition-all duration-300 ${
-            theme === 'dark'
-              ? 'bg-gray-800/80 border border-gray-700 backdrop-blur-sm'
-              : 'bg-white border border-gray-200'
-          }`}>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold">Operation History</h2>
-                <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full">
-                  {history.length} entries
-                </span>
+          
+<div className={`mt-8 p-6 rounded-xl transition-all duration-300 ${
+  theme === 'dark'
+    ? 'bg-gray-800/80 border border-gray-700 backdrop-blur-sm'
+    : 'bg-white border border-gray-200'
+}`}>
+  <div className="flex items-center justify-between mb-6">
+    <div className="flex items-center gap-3">
+      <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+        Operation History
+      </h2>
+      <span className="px-3 py-1 text-xs font-medium bg-blue-100/80 dark:bg-blue-900/30 
+        text-blue-600 dark:text-blue-300 rounded-full border border-blue-200 dark:border-blue-800">
+        {history.length} entries
+      </span>
+    </div>
+    
+    <div className="flex items-center gap-2">
+      <button 
+        onClick={exportHistory}
+        disabled={!history.length}
+        className="group flex items-center gap-2 px-4 py-2 
+          bg-gradient-to-r from-emerald-500 to-green-600 
+          hover:from-emerald-600 hover:to-green-700
+          text-white rounded-lg shadow-md hover:shadow-lg 
+          transition-all duration-300 transform hover:scale-105 
+          active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <Save className="w-4 h-4 transition-transform group-hover:rotate-12" />
+        <span className="font-medium">Export History</span>
+      </button>
+      
+      <button 
+        onClick={() => {
+          if (window.confirm('Are you sure you want to clear the history?')) {
+            clearHistory();
+          }
+        }}
+        disabled={!history.length}
+        className="group flex items-center gap-2 px-4 py-2
+          bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400
+          hover:bg-red-200 dark:hover:bg-red-900/50
+          rounded-lg transition-all duration-300"
+      >
+        <Trash2 className="w-4 h-4 transition-transform group-hover:rotate-12" />
+        <span className="font-medium">Clear</span>
+      </button>
+    </div>
+  </div>
+
+  {history.length === 0 ? (
+    <div className="flex flex-col items-center justify-center py-12">
+      <div className="w-20 h-20 mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 
+        flex items-center justify-center">
+        <Settings className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+      </div>
+      <p className="text-gray-500 dark:text-gray-400 font-medium">No operations yet</p>
+      <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+        Your encryption/decryption history will appear here
+      </p>
+    </div>
+  ) : (
+    <div className="space-y-4">
+      {history.map((entry, index) => (
+        <div 
+          key={index}
+          className={`group p-4 rounded-lg transition-all duration-300 transform hover:scale-[1.01]
+            ${theme === 'dark'
+              ? 'bg-gray-800 hover:bg-gray-750 border border-gray-700'
+              : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
+            }
+          `}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg 
+                ${entry.mode === 'encrypt' 
+                  ? 'bg-blue-100/50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                  : 'bg-purple-100/50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+                }`}
+              >
+                {entry.mode === 'encrypt' ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
               </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={exportHistory}
-                  disabled={!history.length}
-                  className="group flex items-center gap-2 px-4 py-2 
-                    bg-gradient-to-r from-green-500 to-emerald-600 
-                    hover:from-green-600 hover:to-emerald-700
-                    text-white rounded-lg shadow-lg hover:shadow-xl 
-                    transition-all duration-300 transform hover:scale-105 
-                    active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Save className="w-4 h-4 transition-transform group-hover:scale-110" />
-                  <span>Export</span>
-                </button>
-                <button 
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to clear the history?')) {
-                      clearHistory();
-                    }
-                  }}
-                  disabled={!history.length}
-                  className="group flex items-center gap-2 px-4 py-2 
-                    bg-gradient-to-r from-red-500 to-red-600
-                    hover:from-red-600 hover:to-red-700
-                    text-white rounded-lg shadow-lg hover:shadow-xl 
-                    transition-all duration-300 transform hover:scale-105 
-                    active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Trash2 className="w-4 h-4 transition-transform group-hover:scale-110" />
-                  <span>Clear</span>
-                </button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium capitalize">{entry.mode}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700">
+                    {entry.algorithm}
+                  </span>
+                </div>
+                <time className="text-xs text-gray-500 dark:text-gray-400">
+                  {entry.timestamp}
+                </time>
               </div>
             </div>
-
-            {history.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-                <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                  <Settings className="w-8 h-8" />
-                </div>
-                <p className="text-sm">No operations performed yet</p>
-                <p className="text-xs mt-1">Your encryption/decryption history will appear here</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {history.map((entry, index) => (
-                  <div 
-                    key={index}
-                    className={`p-4 rounded-lg transition-all duration-300 transform hover:scale-[1.01] ${
-                      theme === 'dark'
-                        ? 'bg-gray-800 border border-gray-700'
-                        : 'bg-gray-50 border border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                          entry.mode === 'encrypt'
-                            ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
-                            : 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300'
-                        }`}>
-                          {entry.mode}
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {entry.algorithm}
-                        </span>
-                      </div>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
-                        {entry.timestamp}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className="flex-1 font-mono">
-                        <span className="text-gray-500 dark:text-gray-400">Input:</span>
-                        <span className="ml-2">{entry.input}</span>
-                      </div>
-                      <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                      <div className="flex-1 font-mono">
-                        <span className="text-gray-500 dark:text-gray-400">Output:</span>
-                        <span className="ml-2">{entry.output}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <button 
+                onClick={() => {
+                  setInputText(entry.input);
+                  setMode(entry.mode);
+                  setAlgorithm(entry.algorithm);
+                }}
+                className="p-2 rounded-lg text-gray-500 hover:text-blue-500 hover:bg-blue-50 
+                  dark:hover:bg-blue-900/20 transition-colors duration-200"
+                title="Reuse this operation"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-
+          
+          <div className="flex items-start gap-4 pl-12">
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium text-gray-500 dark:text-gray-400">Input:</span>
+                <code className="flex-1 px-2 py-1 bg-gray-100 dark:bg-gray-700/50 rounded">
+                  {entry.input}
+                </code>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium text-gray-500 dark:text-gray-400">Output:</span>
+                <code className="flex-1 px-2 py-1 bg-gray-100 dark:bg-gray-700/50 rounded">
+                  {entry.output}
+                </code>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
           {theme === 'dark' && (
             <>
               <div className="fixed inset-0 bg-gradient-to-b from-black/10 to-transparent pointer-events-none" />

@@ -2,18 +2,35 @@ import * as math from 'mathjs';
 
 // Caesar Cipher
 export function caesarEncrypt(text, shift) {
-    return text.split('').map(char => {
-        if (char.match(/[a-z]/i)) {
-            const asciiOffset = char === char.toUpperCase() ? 65 : 97;
-            return String.fromCharCode(((char.charCodeAt(0) - asciiOffset + shift) % 26) + asciiOffset);
+    let ciphertext = "";
+    
+    for (let char of text) {
+        if (/[a-zA-Z]/.test(char)) {
+            const base = char === char.toUpperCase() ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+            ciphertext += String.fromCharCode((char.charCodeAt(0) - base + shift) % 26 + base);
+        } else {
+            ciphertext += char;
         }
-        return char;
-    }).join('');
+    }
+    return ciphertext;
 }
 
 export function caesarDecrypt(text, shift) {
-    return caesarEncrypt(text, -shift);
+    let plaintext = "";
+    
+    for (let char of text)
+     {
+        if (/[a-zA-Z]/.test(char)) {
+            const base = char === char.toUpperCase() ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+            plaintext += String.fromCharCode((char.charCodeAt(0) - base - shift + 26) % 26 + base);
+        } else {
+            plaintext += char;
+        }
+    }
+    
+    return plaintext;
 }
+
 
 // New helper functions to add
 function gcd(a, b) {
@@ -166,26 +183,28 @@ export function monoDecrypt(text, key) {
 }
 
 // Polyalphabetic (Vigenère) Cipher
-function validateInputs(text, keyword) {
-    if (typeof text !== 'string') throw new Error("Text must be a string.");
-    if (typeof keyword !== 'string') throw new Error("Keyword must be a string.");
-    if (!/^[A-Z]+$/i.test(keyword)) throw new Error("Keyword must contain only alphabetic characters.");
-    if (!text.trim()) throw new Error("Text must not be empty.");
-    if (!keyword.trim()) throw new Error("Keyword must not be empty.");
-}
+// function validateInputs(text, keyword) {
+    
+//     //if (typeof keyword !== 'string') throw new Error("Keyword must be a string.");
+//     if (!/^[A-Z]+$/i.test(keyword)) throw new Error("Keyword must contain only alphabetic characters.");
+//     if (!text.trim()) throw new Error("Text must not be empty.");
+//     if (!keyword.trim()) throw new Error("Keyword must not be empty.");
+// }
 
-function preprocessKeyword(keyword) {
-    return keyword.trim().toUpperCase();
-}
+// function preprocessKeyword(keyword) {
+//     return keyword.trim().toUpperCase();//
+// }
 
-function precomputeShifts(keyword) {
-    return [...keyword].map(char => char.charCodeAt(0) - 65);
-}
+// function precomputeShifts(keyword) {
+//     return [...keyword].map(char => char.charCodeAt(0) - 65);
+// }
 
 export function polyEncrypt(text, keyword) {
+    if (typeof text !== 'string') throw new Error("Text must be a string.");
     if (!text || !keyword) throw new Error("Text and keyword must not be empty");
     if (!/^[A-Za-z]+$/.test(keyword)) {
         throw new Error("Keyword must contain only alphabetic characters");
+    
     }
 
     keyword = keyword.toUpperCase();
@@ -301,28 +320,65 @@ export function playfairDecrypt(text, key) {
 }
 
 // One-Time Pad Cipher
-export function otpEncrypt(text, key) {
-    if (text.length !== key.length) throw new Error("Key length must match text length");
-    return text.split('').map((char, i) => {
-        if (char.match(/[a-z]/i)) {
-            const shift = key[i].toUpperCase().charCodeAt(0) - 65;
-            return caesarEncrypt(char, shift);
-        }
-        return char;
-    }).join('');
+function isAlphabeticKey(key) {
+    return /^[a-zA-Z]+$/.test(key);
 }
 
-export function otpDecrypt(text, key) {
-    if (text.length !== key.length) throw new Error("Key length must match text length");
-    return text.split('').map((char, i) => {
-        if (char.match(/[a-z]/i)) {
-            const shift = key[i].toUpperCase().charCodeAt(0) - 65;
-            return caesarDecrypt(char, shift);
+export function otpEncrypt(plaintext, key) {
+    if (plaintext.length !== key.length) {
+        throw new Error("Plaintext and key must be of the same length.");
+    }
+
+    let ciphertext = "";
+
+    if (isAlphabeticKey(key)) {
+        // Modular addition encryption
+        for (let i = 0; i < plaintext.length; i++) {
+            if (/[a-zA-Z]/.test(plaintext[i])) {
+                const base = plaintext[i] === plaintext[i].toUpperCase() ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+                const keyBase = key[i] === key[i].toUpperCase() ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+                ciphertext += String.fromCharCode((plaintext[i].charCodeAt(0) - base + (key[i].charCodeAt(0) - keyBase)) % 26 + base);
+            } else {
+                ciphertext += plaintext[i];
+            }
         }
-        return char;
-    }).join('');
+    } else {
+        // XOR encryption
+        for (let i = 0; i < plaintext.length; i++) {
+            ciphertext += String.fromCharCode(plaintext[i].charCodeAt(0) ^ key[i].charCodeAt(0));
+        }
+    }
+
+    return ciphertext;
 }
 
+export function otpDecrypt(ciphertext, key) {
+    if (ciphertext.length !== key.length) {
+        throw new Error("Ciphertext and key must be of the same length.");
+    }
+
+    let plaintext = "";
+
+    if (isAlphabeticKey(key)) {
+        // Modular subtraction decryption
+        for (let i = 0; i < ciphertext.length; i++) {
+            if (/[a-zA-Z]/.test(ciphertext[i])) {
+                const base = ciphertext[i] === ciphertext[i].toUpperCase() ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+                const keyBase = key[i] === key[i].toUpperCase() ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+                plaintext += String.fromCharCode((ciphertext[i].charCodeAt(0) - base - (key[i].charCodeAt(0) - keyBase) + 26) % 26 + base);
+            } else {
+                plaintext += ciphertext[i];
+            }
+        }
+    } else {
+        // XOR decryption (same as XOR encryption)
+        for (let i = 0; i < ciphertext.length; i++) {
+            plaintext += String.fromCharCode(ciphertext[i].charCodeAt(0) ^ key[i].charCodeAt(0));
+        }
+    }
+
+    return plaintext;
+}
 // Rail Fence Cipher
 export function railFenceEncrypt(text, rails) {
     text = text.trim();
